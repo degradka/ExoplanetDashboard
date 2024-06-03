@@ -1,5 +1,6 @@
 ﻿using LiveCharts.Defaults;
 using LiveCharts;
+using System.Windows.Controls;
 
 namespace ExoplanetDashboard
 {
@@ -9,11 +10,31 @@ namespace ExoplanetDashboard
         private ChartValues<ObservablePoint> _accelerationData;
         private ChartValues<ObservablePoint> _voltageData;
 
-        public DataProcessor(ChartValues<ObservablePoint> altitudeData, ChartValues<ObservablePoint> accelerationData, ChartValues<ObservablePoint> voltageData)
+        private TextBlock _launchDetectionStatus;
+        private TextBlock _apogeeDetectionStatus;
+        private TextBlock _activatePointStatus;
+        private TextBlock _satellitePointStatus;
+        private TextBlock _parachutePointStatus;
+        private TextBlock _landingPointStatus;
+
+        public DataProcessor(ChartValues<ObservablePoint> altitudeData, ChartValues<ObservablePoint> accelerationData, ChartValues<ObservablePoint> voltageData,
+                             TextBlock launchDetectionStatus,
+                             TextBlock apogeeDetectionStatus,
+                             TextBlock activatePointStatus,
+                             TextBlock satellitePointStatus,
+                             TextBlock parachutePointStatus,
+                             TextBlock landingPointStatus)
         {
             _altitudeData = altitudeData;
             _accelerationData = accelerationData;
             _voltageData = voltageData;
+
+            _launchDetectionStatus = launchDetectionStatus;
+            _apogeeDetectionStatus = apogeeDetectionStatus;
+            _activatePointStatus = activatePointStatus;
+            _satellitePointStatus = satellitePointStatus;
+            _parachutePointStatus = parachutePointStatus;
+            _landingPointStatus = landingPointStatus;
         }
 
         public void ProcessData(string data, out bool parsingError)
@@ -35,12 +56,24 @@ namespace ExoplanetDashboard
                 ChartManager.UpdateAltitudeChart(timeSeconds, altitude);
                 ChartManager.UpdateAccelerationChart(timeSeconds, acceleration);
                 ChartManager.UpdateVoltageChart(timeSeconds, voltage);
+
+                UpdateStatus(packet.StartPoint, packet.ApogeePoint, packet.ActivatePoint, packet.SatPoint, packet.ParachutePoint, packet.LandingPoint);
             }
             else
             {
                 // Set parsingError flag
                 parsingError = true;
             }
+        }
+
+        private void UpdateStatus(bool launchDetected, bool apogeeDetected, bool activatePoint, bool satellitePoint, bool parachutePoint, bool landingPoint)
+        {
+            _launchDetectionStatus.Text = launchDetected ? "TRUE" : "FALSE";
+            _apogeeDetectionStatus.Text = apogeeDetected ? "TRUE" : "FALSE";
+            _activatePointStatus.Text = activatePoint ? "TRUE" : "FALSE";
+            _satellitePointStatus.Text = satellitePoint ? "TRUE" : "FALSE";
+            _parachutePointStatus.Text = parachutePoint ? "TRUE" : "FALSE";
+            _landingPointStatus.Text = landingPoint ? "TRUE" : "FALSE";
         }
     }
 }

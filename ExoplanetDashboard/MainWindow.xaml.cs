@@ -42,7 +42,13 @@ namespace ExoplanetDashboard
             LoadBaudRates();
             DebugInfoText.Text = "";
 
-            _dataProcessor = new DataProcessor(AltitudeData, AccelerationData, VoltageData);
+            _dataProcessor = new DataProcessor(AltitudeData, AccelerationData, VoltageData,
+                                               LaunchDetectionStatus,
+                                               ApogeeDetectionStatus,
+                                               ActivatePointStatus,
+                                               SatellitePointStatus,
+                                               ParachutePointStatus,
+                                               LandingPointStatus);
         }
 
         private void LoadAvailablePorts()
@@ -60,6 +66,11 @@ namespace ExoplanetDashboard
             BaudRateComboBox.Items.Add("57600");
             BaudRateComboBox.Items.Add("115200");
             BaudRateComboBox.SelectedIndex = 0;
+        }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            LoadAvailablePorts();
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
