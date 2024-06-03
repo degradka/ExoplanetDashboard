@@ -1,0 +1,81 @@
+﻿<Window x:Class="ExoplanetDashboard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ExoplanetDashboard"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        Title="Exoplanet Dashboard" Height="450" Width="800">
+    <Grid Background="#333333">
+        <!-- Communication Settings Panel -->
+        <Border BorderBrush="Transparent" BorderThickness="2" Margin="10 10 570 10" Padding="10" Background="#555555" VerticalAlignment="Top" CornerRadius="5,5,5,5">
+            <StackPanel>
+                <TextBlock Text="Communication Settings" Foreground="White" FontSize="16" Margin="0 0 0 10"/>
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                    <TextBlock Text="Port" Foreground="White" Margin="0 0 34 0" HorizontalAlignment="Left"/>
+                    <ComboBox x:Name="PortComboBox" Width="120" Height="20"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="BaudRate" Foreground="White" Margin="0 0 5 0"/>
+                    <ComboBox x:Name="BaudRateComboBox" Width="120" BorderBrush="White"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons and Connection Status Panel -->
+        <StackPanel VerticalAlignment="Top" Margin="40,120,500,0">
+            <!-- Buttons Panel -->
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="OpenButton" Content="Open" HorizontalAlignment="Left" Margin="0 0 10 0" Width="75" Background="White" Click="OpenButton_Click" BorderBrush="White"/>
+                <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Left" Width="75" Background="White" Click="CloseButton_Click" BorderBrush="White"/>
+            </StackPanel>
+
+            <!-- Connection Status -->
+            <TextBlock x:Name="ConnectionStatusText" Text="Disconnected" Foreground="#F44336" FontSize="16" Margin="10 5 0 0" Width="197"/>
+        </StackPanel>
+
+        <!-- Incoming Data Packets Panel -->
+        <Border BorderBrush="#00000000" BorderThickness="2" Margin="0 0 10 10" Padding="10" Background="#555555" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="300" CornerRadius="5,5,5,5">
+            <StackPanel>
+                <TextBlock Text="Incoming Data Packets" Foreground="White" FontSize="16" Margin="0 0 0 10"/>
+                <TextBox x:Name="IncomingDataTextBox" TextWrapping="Wrap" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Height="20"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Debug Information Panel -->
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="460" Height="22">
+            <TextBlock x:Name="DebugInfoText" TextWrapping="Wrap" Foreground="#FF7F7F7F" Text="DEBUG INFO" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
+        </StackPanel>
+
+        <!-- Altitude Panel -->
+        <Border Background="#444444" Margin="260,10,290,0" Padding="10" VerticalAlignment="Top" Height="230" CornerRadius="5,5,5,5">
+            <StackPanel>
+                <TextBlock Text="Altitude" Foreground="White" FontSize="20" HorizontalAlignment="Center"/>
+                <lvc:CartesianChart x:Name="AltitudeChart" Width="180" Height="180" DisableAnimations="true">
+                    <lvc:CartesianChart.Series>
+                        <lvc:LineSeries Title="Altitude" Values="{Binding AltitudeData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="Time"/>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="Altitude"/>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </StackPanel>
+        </Border>
+        <Border Background="#444444" Margin="315,260,345,0" Padding="10" VerticalAlignment="Top" Height="50" CornerRadius="5,5,5,5">
+            <StackPanel>
+                <TextBlock Text="Altitude" Foreground="White" FontSize="10" HorizontalAlignment="Center"/>
+                <Rectangle Width="8" Height="8" Fill="#FF007ACC" Margin="80 -10 0 0"/>
+                <TextBlock x:Name="AltitudeDataText" Text="100m" Foreground="White" FontSize="15" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        <!-- Credit line -->
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Top">
+            <TextBlock Foreground="Gray" FontSize="10" Margin="0,5,5,0" Background="Transparent" Padding="5">
+        <Run Text="by degradka"/>
+        <LineBreak/>
+        <Run Text="for Exoplanet"/>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Window>
