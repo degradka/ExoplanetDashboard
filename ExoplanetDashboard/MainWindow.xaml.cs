@@ -23,21 +23,26 @@ namespace ExoplanetDashboard
         private ChartManager _chartManager;
 
         public ChartValues<ObservablePoint> AltitudeData { get; set; }
+        public ChartValues<ObservablePoint> AccelerationData { get; set; }
+        public ChartValues<ObservablePoint> VoltageData { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
 
-            // Initialize Altitude Chart
             AltitudeData = new ChartValues<ObservablePoint>();
-            _chartManager = new ChartManager(AltitudeChart, AltitudeData, AltitudeDataText);
+            AccelerationData = new ChartValues<ObservablePoint>();
+            VoltageData = new ChartValues<ObservablePoint>();
+            _chartManager = new ChartManager(AltitudeChart, AltitudeData, AltitudeDataText, 
+                                             AccelerationChart, AccelerationData, AccelerationDataText, 
+                                             VoltageChart, VoltageData, VoltageDataText);
 
             LoadAvailablePorts();
             LoadBaudRates();
-            DebugInfoText.Text = ""; // Initialize DebugInfoText
+            DebugInfoText.Text = "";
 
-            _dataProcessor = new DataProcessor(AltitudeData);
+            _dataProcessor = new DataProcessor(AltitudeData, AccelerationData, VoltageData);
         }
 
         private void LoadAvailablePorts()
