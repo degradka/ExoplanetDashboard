@@ -1,4 +1,4 @@
-﻿using LiveCharts;
+using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using LiveCharts.Wpf.Charts.Base;
@@ -115,7 +115,7 @@ namespace ExoplanetDashboard
             // Add new altitude data point
             _altitudeData.Add(new ObservablePoint(timeSeconds, altitude));
 
-            _altitudeDataText.Text = altitude.ToString("0.##") + "m";
+            _altitudeDataText.Text = altitude.ToString("0.##") + " m";
         }
 
         public static void UpdateAccelerationChart(double timeSeconds, double acceleration)
@@ -137,7 +137,7 @@ namespace ExoplanetDashboard
 
             _accelerationData.Add(new ObservablePoint(timeSeconds, acceleration));
 
-            _accelerationDataText.Text = acceleration.ToString("0.##") + "m/s²";
+            _accelerationDataText.Text = acceleration.ToString("0.##") + " m/s²";
         }
 
         public static void UpdateVoltageChart(double timeSeconds, double voltage)
@@ -159,7 +159,7 @@ namespace ExoplanetDashboard
 
             _voltageData.Add(new ObservablePoint(timeSeconds, voltage));
 
-            _voltageDataText.Text = voltage.ToString("0.##") + "V";
+            _voltageDataText.Text = voltage.ToString("0.##") + " V";
         }
     }
 }
