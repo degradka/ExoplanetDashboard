@@ -1,181 +1,548 @@
-﻿<Window x:Class="ExoplanetDashboard.MainWindow"
+<Window x:Class="ExoplanetDashboard.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:ExoplanetDashboard"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-        Title="Exoplanet Dashboard" Height="677" Width="811" ResizeMode="NoResize">
-    <Grid Background="#333333">
-        <!-- Communication Settings Panel -->
-        <Border BorderBrush="White" BorderThickness="2" Margin="10,59,581,0" Padding="10" Background="#555555" VerticalAlignment="Top" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Communication Settings" Foreground="White" FontSize="16" Margin="0 0 0 10"/>
-                <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
-                    <TextBlock Text="Port" Foreground="White" Margin="0 0 34 0" HorizontalAlignment="Left"/>
-                    <ComboBox x:Name="PortComboBox" Width="120" Height="20"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="BaudRate" Foreground="White" Margin="0 0 5 0"/>
-                    <ComboBox x:Name="BaudRateComboBox" Width="120" BorderBrush="White"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
+        Title="Exoplanet Dashboard" Height="804" Width="1152" ResizeMode="NoResize">
 
-        <!-- Buttons and Connection Status Panel -->
-        <StackPanel VerticalAlignment="Top" Margin="10,169,581,0">
-            <!-- Buttons Panel -->
-            <StackPanel Orientation="Horizontal" Width="180">
-                <Button x:Name="OpenButton" Content="Open" HorizontalAlignment="Left" Margin="5,0,10,0" Width="60" Background="White" Click="OpenButton_Click" BorderBrush="White" VerticalAlignment="Center"/>
-                <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Left" Width="60" Background="White" Click="CloseButton_Click" BorderBrush="White" VerticalAlignment="Center"/>
-                <Button x:Name="RefreshButton" HorizontalAlignment="Left" Width="30" Background="White" Click="RefreshButton_Click" BorderBrush="Transparent" VerticalAlignment="Center" Margin="10,0,0,0" Height="22">
-                    <TextBlock Text="🔄" Height="20"/>
-                </Button>
-            </StackPanel>
+	<Window.Resources>
+		<FontFamily x:Key="RobotoRegular">/ExoplanetDashboard;component/Fonts/Roboto-Regular.ttf#Roboto</FontFamily>
+		<FontFamily x:Key="RobotoMedium">/ExoplanetDashboard;component/Fonts/Roboto-Medium.ttf#Roboto</FontFamily>
 
-            <!-- Connection Status -->
-            <TextBlock x:Name="ConnectionStatusText" Text="Disconnected" Foreground="#F44336" FontSize="16" Width="96" HorizontalAlignment="Center" Height="22" VerticalAlignment="Bottom" Margin="0,10,0,0"/>
-        </StackPanel>
+		<!-- Blue Button Style -->
+		<Style x:Key="BlueButtonStyle" TargetType="Button">
+			<Setter Property="FontFamily" Value="{StaticResource RobotoRegular}"/>
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Background" Value="#FF3B82F6"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="border"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								CornerRadius="8">
+							<ContentPresenter HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											TextElement.FontFamily="{StaticResource RobotoRegular}"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="border" Property="Background" Value="#FF4085F7"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-        <!-- Incoming Data Packets Panel -->
-        <Border BorderBrush="White" BorderThickness="2" Margin="536,559,10,0" Padding="10" VerticalAlignment="Top" Background="#555555" Height="70" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Incoming Data Packets" Foreground="White" FontSize="12" Margin="0 0 0 10"/>
-                <TextBox x:Name="IncomingDataTextBox" TextWrapping="Wrap" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Height="20"/>
-            </StackPanel>
-        </Border>
+		<!-- Red Button Style -->
+		<Style x:Key="RedButtonStyle" TargetType="Button">
+			<Setter Property="FontFamily" Value="{StaticResource RobotoRegular}"/>
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Background" Value="#FFEF4444"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="border"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								CornerRadius="8">
+							<ContentPresenter HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											TextElement.FontFamily="{StaticResource RobotoRegular}"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="border" Property="Background" Value="#FFF14747"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-        <!-- Debug Information Panel -->
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="460" Height="22">
-            <TextBlock x:Name="DebugInfoText" TextWrapping="Wrap" Foreground="#FF7F7F7F" Text="DEBUG INFO" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
-        </StackPanel>
+		<!-- Green Button Style -->
+		<Style x:Key="GreenButtonStyle" TargetType="Button">
+			<Setter Property="FontFamily" Value="{StaticResource RobotoRegular}"/>
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Background" Value="#FFEF4444"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="border"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								CornerRadius="8">
+							<ContentPresenter HorizontalAlignment="Center"
+											VerticalAlignment="Center"
+											TextElement.FontFamily="{StaticResource RobotoRegular}"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="border" Property="Background" Value="#FF40F76E"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
 
-        <!-- Altitude Panel -->
-        <Border Background="#444444" Margin="250,10,296,0" Padding="10" VerticalAlignment="Top" Height="230" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Altitude" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <lvc:CartesianChart x:Name="AltitudeChart" Width="180" Height="180" DisableAnimations="true" Background="#333333">
-                    <lvc:CartesianChart.Series>
-                        <lvc:LineSeries Title="Altitude" Values="{Binding AltitudeData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
-                    </lvc:CartesianChart.Series>
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="Time"/>
-                    </lvc:CartesianChart.AxisX>
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Altitude"/>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
-            </StackPanel>
-        </Border>
-        <Border Background="#444444" Margin="308,259,353,0" Padding="10" VerticalAlignment="Top" Height="50" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Altitude" Foreground="White" FontSize="10" HorizontalAlignment="Center"/>
-                <Rectangle Width="8" Height="8" Fill="DodgerBlue" Margin="80 -12 0 0"/>
-                <TextBlock x:Name="AltitudeDataText" Text="100m" Foreground="White" FontSize="15" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </Border>
+	<Grid Background="#FF1E1E1E">
+		<Grid.RowDefinitions>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+		</Grid.ColumnDefinitions>
 
-        <!-- Credit line -->
-        <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
-            <TextBlock Foreground="Gray" FontSize="10" Margin="10,10,0,0" Background="Transparent" Padding="5">
-        <Run Text="by degradka      alpha v1.0.0"/>
-        <LineBreak/>
-        <Run Text="for Exoplanet"/>
-            </TextBlock>
-        </Grid>
+		<!-- Logo -->
+		<Image VerticalAlignment="Top" HorizontalAlignment="Left" Source="/exoplanet_logo_dark.png" Stretch="Fill" Height="60" Margin="24,19,540,585" Width="247.5" />
 
-        <!-- Acceleration Panel -->
-        <Border Background="#444444" Margin="536,10,10,0" Padding="10" VerticalAlignment="Top" Height="230" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Acceleration" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <lvc:CartesianChart x:Name="AccelerationChart" Width="180" Height="180" DisableAnimations="true" Background="#333333">
-                    <lvc:CartesianChart.Series>
-                        <lvc:LineSeries Title="Acceleration" Values="{Binding AccelerationData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
-                    </lvc:CartesianChart.Series>
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="Time"/>
-                    </lvc:CartesianChart.AxisX>
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Acceleration"/>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
-            </StackPanel>
-        </Border>
-        <Border Background="#444444" Margin="594,259,67,0" Padding="10" VerticalAlignment="Top" Height="50" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Acceleration" Foreground="White" FontSize="10" HorizontalAlignment="Center"/>
-                <Rectangle Width="8" Height="8" Fill="MediumVioletRed" Margin="80 -12 0 0"/>
-                <TextBlock x:Name="AccelerationDataText" Text="2m/s²" Foreground="White" FontSize="15" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </Border>
-        <Border Background="#444444" Margin="250,329,296,0" Padding="10" VerticalAlignment="Top" Width="265" Height="230" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Voltage" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <lvc:CartesianChart x:Name="VoltageChart" Width="180" Height="180" DisableAnimations="true" Background="#333333">
-                    <lvc:CartesianChart.Series>
-                        <lvc:LineSeries Title="Voltage" Values="{Binding AccelerationData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
-                    </lvc:CartesianChart.Series>
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="Time"/>
-                    </lvc:CartesianChart.AxisX>
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Voltage"/>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
-            </StackPanel>
-        </Border>
-        <Border Background="#444444" Margin="308,579,353,0" Padding="10" VerticalAlignment="Top" Height="50" CornerRadius="5,5,5,5">
-            <StackPanel>
-                <TextBlock Text="Acceleration" Foreground="White" FontSize="10" HorizontalAlignment="Center"/>
-                <Rectangle Width="8" Height="8" Fill="LawnGreen" Margin="80 -12 0 0"/>
-                <TextBlock x:Name="VoltageDataText" Text="4.9V" Foreground="White" FontSize="15" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </Border>
-        <Border BorderBrush="White" BorderThickness="2" Margin="536,331,10,102" Padding="10" Background="#555555" CornerRadius="5,5,5,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="Status" Foreground="White" FontSize="20" FontWeight="Bold" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <Grid Grid.Row="1" Margin="0,10,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+		<!-- Credit line -->
+		<TextBlock Foreground="Gray" FontSize="10" Background="Transparent" Padding="5" RenderTransformOrigin="0.5,0.5">
+			<TextBlock.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform X="300" Y="30"/>
+				</TransformGroup>
+			</TextBlock.RenderTransform>
+			<Run Text="by degradka      alpha v1.2.0"/>
+			<LineBreak/>
+			<Run Text="for Exoplanet"/>
+		</TextBlock>
 
-                    <TextBlock Text="Launch Detection" Foreground="White" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                    <TextBlock x:Name="LaunchDetectionStatus" Text="FALSE" Foreground="White" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,5,0,0"/>
+		<!-- Communication Settings Panel -->
+		<StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal" Margin="148,34,346,592">
+			<StackPanel.Resources>
+				<FontFamily x:Key="RobotoRegular">/ExoplanetDashboard;component/Fonts/Roboto-Regular.ttf#Roboto</FontFamily>
+				<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+				<local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+				<Style x:Key="ComboBoxStyle" TargetType="ComboBox">
+					<Setter Property="Background" Value="#2C2C2C"/>
+					<Setter Property="Foreground" Value="White"/>
+					<Setter Property="FontFamily" Value="{StaticResource RobotoRegular}"/>
+					<Setter Property="FontSize" Value="16"/>
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="ComboBox">
+								<Border x:Name="border"
+										Background="{TemplateBinding Background}"
+										BorderBrush="{x:Null}"
+										CornerRadius="8">
+									<Grid>
+										<TextBlock Text="{TemplateBinding Tag}"
+												   Margin="10,0,0,0"
+												   VerticalAlignment="Center"
+												   Foreground="#99FFFFFF"
+												   IsHitTestVisible="False"
+												   FontFamily="{StaticResource RobotoRegular}"
+												   Visibility="{Binding Path=SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToVisibilityConverter}}"/>
+										<ToggleButton x:Name="ToggleButton"
+													BorderBrush="{TemplateBinding BorderBrush}"
+													Background="Transparent"
+													Focusable="False"
+													IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+													ClickMode="Press">
+											<ToggleButton.Template>
+												<ControlTemplate TargetType="ToggleButton">
+													<Border x:Name="toggleBorder" Background="Transparent">
+														<Grid>
+															<Grid.ColumnDefinitions>
+																<ColumnDefinition />
+																<ColumnDefinition Width="20" />
+															</Grid.ColumnDefinitions>
+															<ContentPresenter Grid.Column="0"
+																			Margin="10,0,0,0"
+																			VerticalAlignment="Center" />
+															<Path Grid.Column="1"
+																  x:Name="Arrow"
+																  Fill="White"
+																  Data="M0,0 L4,4 L8,0"
+																  VerticalAlignment="Center"
+																  HorizontalAlignment="Center"/>
+														</Grid>
+													</Border>
+												</ControlTemplate>
+											</ToggleButton.Template>
+										</ToggleButton>
+										<ContentPresenter x:Name="ContentSite"
+														Content="{TemplateBinding SelectionBoxItem}"
+														ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+														ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+														VerticalAlignment="Center"
+														HorizontalAlignment="Left"
+														Margin="10,0,0,0"/>
+										<Popup x:Name="Popup"
+											 Placement="Bottom"
+											 IsOpen="{TemplateBinding IsDropDownOpen}"
+											 AllowsTransparency="True"
+											 Focusable="False"
+											 PopupAnimation="Fade"
+											 VerticalOffset="5">
+											<Grid x:Name="DropDown"
+												  SnapsToDevicePixels="True"
+												  MinWidth="{TemplateBinding ActualWidth}"
+												  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+												<Border x:Name="DropDownBorder"
+														Background="#2C2C2C"
+														CornerRadius="8"
+														Padding="0,4">
+													<ScrollViewer SnapsToDevicePixels="True">
+														<StackPanel IsItemsHost="True"
+																  KeyboardNavigation.DirectionalNavigation="Contained" />
+													</ScrollViewer>
+												</Border>
+											</Grid>
+										</Popup>
+									</Grid>
+								</Border>
+								<ControlTemplate.Triggers>
+									<Trigger Property="IsMouseOver" Value="True">
+										<Setter TargetName="border" Property="Background" Value="#2F2F2F"/>
+									</Trigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+					<Setter Property="ItemContainerStyle">
+						<Setter.Value>
+							<Style TargetType="ComboBoxItem">
+								<Setter Property="FontFamily" Value="{StaticResource RobotoRegular}"/>
+								<Setter Property="Template">
+									<Setter.Value>
+										<ControlTemplate TargetType="ComboBoxItem">
+											<Border x:Name="Bd"
+													Padding="10,8"
+													Background="Transparent"
+													CornerRadius="4"
+													Margin="4,0,4,0">
+												<TextBlock x:Name="Txt"
+														 Text="{Binding}"
+														   FontFamily="{StaticResource RobotoRegular}"
+														 Foreground="White"/>
+											</Border>
+											<ControlTemplate.Triggers>
+												<Trigger Property="IsMouseOver" Value="True">
+													<Setter TargetName="Bd" Property="Background" Value="#1AFFFFFF"/>
+													<Setter TargetName="Txt" Property="Foreground" Value="#4F9BF7"/>
+												</Trigger>
+											</ControlTemplate.Triggers>
+										</ControlTemplate>
+									</Setter.Value>
+								</Setter>
+							</Style>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</StackPanel.Resources>
 
-                    <TextBlock Text="Apogee Detection" Foreground="White" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock x:Name="ApogeeDetectionStatus" Text="FALSE" Foreground="White" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,0,0"/>
+			<ComboBox x:Name="PortComboBox"
+					  Width="161"
+					  Height="37"
+					  Style="{StaticResource ComboBoxStyle}">
+				<ComboBox.Tag>Select COM Port</ComboBox.Tag>
+			</ComboBox>
 
-                    <TextBlock Text="Activate Point" Foreground="White" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock x:Name="ActivatePointStatus" Text="FALSE" Foreground="White" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,0,0"/>
+			<ComboBox x:Name="BaudRateComboBox"
+					  Width="165"
+					  Height="37"
+					  Style="{StaticResource ComboBoxStyle}"
+					  Margin="16,0,0,0">
+				<ComboBox.Tag>Select Baud Rate</ComboBox.Tag>
+			</ComboBox>
 
-                    <TextBlock Text="Satellite Point" Foreground="White" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock x:Name="SatellitePointStatus" Text="FALSE" Foreground="White" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,0,0"/>
+		</StackPanel>
 
-                    <TextBlock Text="Parachute Point" Foreground="White" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock x:Name="ParachutePointStatus" Text="FALSE" Foreground="White" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,0,0"/>
+		<!-- Buttons and Connection Status Panel -->
+		<StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,32,24,0" Width="306" Height="40">
+			<!-- Buttons Panel -->
+			<StackPanel Orientation="Horizontal" Width="306" Height="40">
+				<Button x:Name="OpenButton" Content="Connect" HorizontalAlignment="Left" Margin="0,0,15,0" Width="92" Background="#FF3B82F6" Click="OpenButton_Click" VerticalAlignment="Center" Height="40" Foreground="White" BorderBrush="{x:Null}" Style="{StaticResource BlueButtonStyle}"/>
+				<Button x:Name="CloseButton" Content="Disconnect" HorizontalAlignment="Left" Width="111" Background="#FFEF4444" Click="CloseButton_Click" VerticalAlignment="Center" Foreground="White" Height="40" BorderBrush="{x:Null}" Style="{StaticResource RedButtonStyle}"/>
+				<Button x:Name="RefreshButton" HorizontalAlignment="Left" Width="40" Background="#FF3BF669" Click="RefreshButton_Click" BorderBrush="{x:Null}" VerticalAlignment="Center" Margin="16,0,16,0" Height="40" Style="{StaticResource GreenButtonStyle}" Foreground="White">
+					<TextBlock Text="🔄" Height="20"/>
+				</Button>
 
-                    <TextBlock Text="Landing Point" Foreground="White" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock Text=":" Foreground="White" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                    <TextBlock x:Name="LandingPointStatus" Text="FALSE" Foreground="White" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,0,0"/>
-                </Grid>
-            </Grid>
-        </Border>
-    </Grid>
+				<!-- Connection Status -->
+				<Border x:Name="ConnectionIndicator" Width="16" Height="16" CornerRadius="8" RenderTransformOrigin="0.5,0.5">
+					<Border.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform/>
+							<SkewTransform/>
+							<RotateTransform/>
+							<TranslateTransform Y="0"/>
+						</TransformGroup>
+					</Border.RenderTransform>
+					<Border.Style>
+						<Style TargetType="Border">
+							<Setter Property="Background" Value="#FF4B5563"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding ElementName=ConnectionIndicator, Path=Tag}" Value="Connected">
+									<Setter Property="Background" Value="#FF34D399"/>
+									<DataTrigger.EnterActions>
+										<BeginStoryboard>
+											<Storyboard>
+												<DoubleAnimation
+													Storyboard.TargetProperty="Opacity"
+													From="0.4" To="1.0" Duration="0:0:1"
+													AutoReverse="True"
+													RepeatBehavior="Forever"/>
+											</Storyboard>
+										</BeginStoryboard>
+									</DataTrigger.EnterActions>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Border.Style>
+				</Border>
+			</StackPanel>
+		</StackPanel>
+
+		<!-- Incoming Data Packets Panel -->
+		<Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="68" Width="1104">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform Y="-22"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<StackPanel Width="1104">
+				<TextBlock Text="Incoming Data Packets:" Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="14" Margin="0 0 0 5"/>
+				<TextBox x:Name="IncomingDataTextBox" TextWrapping="Wrap" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Width="1104" Height="42" BorderBrush="{x:Null}" Background="#FF2C2C2C" Foreground="White" SelectionBrush="{x:Null}"
+						 FontFamily="{StaticResource RobotoRegular}" FontSize="16" Padding="10,0,0,0" VerticalContentAlignment="Center" IsHitTestVisible="False">
+					<TextBox.Resources>
+						<Style TargetType="{x:Type Border}">
+							<Setter Property="CornerRadius" Value="8"/>
+						</Style>
+					</TextBox.Resources>
+				</TextBox>
+			</StackPanel>
+		</Border>
+
+		<!-- Debug Information Panel -->
+		<StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="460" Height="22">
+			<TextBlock x:Name="DebugInfoText" TextWrapping="Wrap" Foreground="#FF7F7F7F" Text="DEBUG INFO" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"/>
+		</StackPanel>
+
+		<!-- Altitude Panel -->
+		<Border Background="#2C2C2C" Width="357" Height="294" CornerRadius="8" RenderTransformOrigin="0.5,0.5">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform X="-366" Y="-140"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<Grid>
+				<!-- Title -->
+				<TextBlock Text="Altitude Graph"
+						 Foreground="White"
+						 FontSize="18"
+						 FontFamily="{StaticResource RobotoMedium}"
+						 HorizontalAlignment="Left"
+						 VerticalAlignment="Top"
+						 Margin="17,17,0,0"/>
+
+				<!-- Chart -->
+				<lvc:CartesianChart x:Name="AltitudeChart"
+								   Height="190"
+								   DisableAnimations="true"
+								   Background="#2C2C2C"
+								   VerticalAlignment="Center" Width="325">
+					<lvc:CartesianChart.Series>
+						<lvc:LineSeries Title="Altitude"
+									   Values="{Binding AltitudeData}"
+									   LineSmoothness="0"
+									   StrokeThickness="1"
+									   PointGeometrySize="2"/>
+					</lvc:CartesianChart.Series>
+					<lvc:CartesianChart.AxisX>
+						<lvc:Axis Title="Time"/>
+					</lvc:CartesianChart.AxisX>
+					<lvc:CartesianChart.AxisY>
+						<lvc:Axis Title="Altitude"/>
+					</lvc:CartesianChart.AxisY>
+				</lvc:CartesianChart>
+
+				<!-- Current Value -->
+				<StackPanel Orientation="Horizontal"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Bottom"
+							Margin="17,0,0,17">
+					<TextBlock Text="Current Value: "
+							 Foreground="#FF9CA3AF"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+					<TextBlock x:Name="AltitudeDataText"
+							 Text="0 m"
+							 Foreground="White"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Acceleration Panel -->
+		<Border Background="#2C2C2C" Width="357" Height="294" CornerRadius="8" RenderTransformOrigin="0.5,0.5">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform Y="-140" X="0"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<Grid>
+				<!-- Title -->
+				<TextBlock Text="Acceleration Graph"
+						 Foreground="White"
+						 FontSize="18"
+						 FontFamily="{StaticResource RobotoMedium}"
+						 HorizontalAlignment="Left"
+						 VerticalAlignment="Top"
+						 Margin="17,17,0,0"/>
+
+				<!-- Chart -->
+				<lvc:CartesianChart x:Name="AccelerationChart" Width="325" Height="190" DisableAnimations="true" Background="#2C2C2C">
+					<lvc:CartesianChart.Series>
+						<lvc:LineSeries Title="Acceleration" Values="{Binding AccelerationData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
+					</lvc:CartesianChart.Series>
+					<lvc:CartesianChart.AxisX>
+						<lvc:Axis Title="Time"/>
+					</lvc:CartesianChart.AxisX>
+					<lvc:CartesianChart.AxisY>
+						<lvc:Axis Title="Acceleration"/>
+					</lvc:CartesianChart.AxisY>
+				</lvc:CartesianChart>
+
+				<!-- Current Value -->
+				<StackPanel Orientation="Horizontal"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Bottom"
+							Margin="17,0,0,17">
+					<TextBlock Text="Current Value: "
+							 Foreground="#FF9CA3AF"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+					<TextBlock x:Name="AccelerationDataText"
+							 Text="0 m/s²"
+							 Foreground="White"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Voltage Panel -->
+		<Border Background="#2C2C2C" Width="357" Height="294" CornerRadius="8" RenderTransformOrigin="0.5,0.5">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform Y="-140" X="366"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<Grid>
+				<!-- Title -->
+				<TextBlock Text="Voltage Graph"
+						 Foreground="White"
+						 FontSize="18"
+						 FontFamily="{StaticResource RobotoMedium}"
+						 HorizontalAlignment="Left"
+						 VerticalAlignment="Top"
+						 Margin="17,17,0,0"/>
+
+				<!-- Chart -->
+				<lvc:CartesianChart x:Name="VoltageChart" Width="325" Height="190" DisableAnimations="true" Background="#2C2C2C">
+					<lvc:CartesianChart.Series>
+						<lvc:LineSeries Title="Voltage" Values="{Binding AccelerationData}" LineSmoothness="0" StrokeThickness="1" PointGeometrySize="2"/>
+					</lvc:CartesianChart.Series>
+					<lvc:CartesianChart.AxisX>
+						<lvc:Axis Title="Time"/>
+					</lvc:CartesianChart.AxisX>
+					<lvc:CartesianChart.AxisY>
+						<lvc:Axis Title="Voltage"/>
+					</lvc:CartesianChart.AxisY>
+				</lvc:CartesianChart>
+
+				<!-- Current Value -->
+				<StackPanel Orientation="Horizontal"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Bottom"
+							Margin="17,0,0,17">
+					<TextBlock Text="Current Value: "
+							 Foreground="#FF9CA3AF"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+					<TextBlock x:Name="VoltageDataText"
+							 Text="0 V"
+							 Foreground="White"
+							 FontSize="16"
+							 FontFamily="{StaticResource RobotoRegular}"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Status List -->
+		<Border Background="#2C2C2C" Width="544" Height="262" CornerRadius="8" RenderTransformOrigin="0.5,0.5">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform X="-273" Y="154"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<StackPanel Margin="16">
+				<TextBlock Text="Status List" Foreground="White" FontFamily="{StaticResource RobotoMedium}" FontSize="18" Margin="0,0,0,16"/>
+				<StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+					<TextBlock Text="Launch Detection: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="LaunchDetectionStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+				<StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+					<TextBlock Text="Apogee Detection: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="ApogeeDetectionStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+				<StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+					<TextBlock Text="Activate Point: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="ActivatePointStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+				<StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+					<TextBlock Text="Satellite Point: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="SatellitePointStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+				<StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+					<TextBlock Text="Parachute Point: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="ParachutePointStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="Landing Point: " Foreground="#FF9CA3AF" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+					<TextBlock x:Name="LandingPointStatus" Text="FALSE" Foreground="White" FontFamily="{StaticResource RobotoRegular}" FontSize="16"/>
+				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<!-- Rocket Axis -->
+		<Border Background="#2C2C2C" Height="262" CornerRadius="8" RenderTransformOrigin="0.5,0.5" Width="530">
+			<Border.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform X="280" Y="154"/>
+				</TransformGroup>
+			</Border.RenderTransform>
+			<StackPanel Margin="16">
+				<TextBlock Text="3D Rocket Axis Preview" Foreground="White" FontFamily="{StaticResource RobotoMedium}" FontSize="18" Margin="0,0,0,16"/>
+				<TextBlock HorizontalAlignment="Center" Text="Preview of the rocket axis will be displayed here." Foreground="#6B7280" FontFamily="{StaticResource RobotoMedium}" FontSize="16" Margin="0,68,0,0"/>
+			</StackPanel>
+		</Border>
+	</Grid>
 </Window>
