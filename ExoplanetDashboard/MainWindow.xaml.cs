@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO.Ports;
 using System.Windows;
 using LiveCharts;
@@ -9,9 +9,23 @@ using System.Diagnostics;
 using System.Globalization;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
+using System.Windows.Data;
 
 namespace ExoplanetDashboard
 {
+    public class NullToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value == null ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public partial class MainWindow : Window
     {
         private SerialPort _serialPort;
@@ -65,7 +79,7 @@ namespace ExoplanetDashboard
             BaudRateComboBox.Items.Add("38400");
             BaudRateComboBox.Items.Add("57600");
             BaudRateComboBox.Items.Add("115200");
-            BaudRateComboBox.SelectedIndex = 0;
+            BaudRateComboBox.SelectedIndex = -1;
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
@@ -87,8 +101,7 @@ namespace ExoplanetDashboard
                     _serialPort.Open();
                     if (_serialPort.IsOpen)
                     {
-                        ConnectionStatusText.Text = "Connected";
-                        ConnectionStatusText.Foreground = System.Windows.Media.Brushes.Green;
+                        ConnectionIndicator.Tag = "Connected";
                         DebugInfoText.Text = "Connected to " + selectedPort + " at " + selectedBaudRate + " baud.";
 
                         // Generate a unique filename with a timestamp
@@ -165,8 +178,7 @@ namespace ExoplanetDashboard
                 try
                 {
                     _serialPort.Close();
-                    ConnectionStatusText.Text = "Disconnected";
-                    ConnectionStatusText.Foreground = System.Windows.Media.Brushes.Red;
+                    ConnectionIndicator.Tag = "Disconnected";
                     DebugInfoText.Text = "Serial port closed.";
 
                     // Close the file writer
